@@ -28,8 +28,21 @@ var map;
 function initMap(){
   // New map
   map = new google.maps.Map(document.getElementById('map'), options);
+  loadMapShapes();
   drawPoints();
 }
+function loadMapShapes() {
+  // load US state outline polygons from a GeoJson file
+  map.data.loadGeoJson('districts.json', { idPropertyName: 'STATE' });
+
+  // wait for the request to complete by listening for the first feature to be
+  // added
+  google.maps.event.addListenerOnce(map.data, 'addfeature', function() {
+    google.maps.event.trigger(document.getElementById('census-variable'),
+        'change');
+  });
+}
+
 function suppressionPoint(location, type, description) {
     this.location = location;
     this.type = type;
@@ -60,7 +73,7 @@ function addCircle(sp){
     fillColor: "#000000",
     map: map,
     center: sp.location,
-    radius: 10000
+    radius: 100000
   });
   switch(sp.type){
     case 0:
