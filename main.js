@@ -22,12 +22,59 @@ function init(){
     target: 'map'
   })
 
+  //Vector layers
+  const districtsGeoJSON = new ol.layer.VectorImage({
+    source: new ol.source.Vector({
+      url: './data/districts.json',
+      format: new ol.format.GeoJSON()
+    }),
+    visible: true,
+    title: 'DistrictsGeoJSON'
+  })
+
+  const statesGeoJSON = new ol.layer.VectorImage({
+    source: new ol.source.Vector({
+      url: './data/states.json',
+      format: new ol.format.GeoJSON()
+    }),
+    visible: true,
+    title: 'StatesGeoJSON'
+  })
+
+  //map.addLayer(districtsGeoJSON);
+  const openStreetMapHumanitarian = new ol.layer.Tile({
+    source: new ol.source.OSM({
+      url: 'http://tile.stamen.com/toner/{z}/{x}/{y}.png'
+    }),
+    visbile: true,
+    title: 'OSMHumanitarian'
+  })
+  map.removeLayer();
+
+  var currZoom = map.getView().getZoom();
+  map.on('moveend', function(e) {
+    var newZoom = map.getView().getZoom();
+    if (currZoom != newZoom) {
+      if(newZoom >= 6){
+        map.removeLayer(statesGeoJSON);
+        map.addLayer(districtsGeoJSON);
+      }
+      else{
+        map.removeLayer(districtsGeoJSON);
+        map.addLayer(statesGeoJSON);
+      }
+      currZoom = newZoom;
+    }
+  });
+
   map.on('click', function(e){
     console.log(e.coordinate);
   })
   //toggleFullScreen("#map");
+  //toggleFullScreen("#map");
 }
 
+// Toggling class of map div
 function toggleFullScreen(mapContainer) {
   if ($(mapContainer).hasClass("normal")) {
       $(mapContainer).addClass("fullscreen").removeClass("normal");
