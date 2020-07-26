@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>VSMap Prototype</title>
+  <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch,requestAnimationFrame,Element.prototype.classList,URL"></script>
   <link rel="stylesheet" href="./libs/v6.3.1-dist/ol.css"></link>
   <link rel="stylesheet" href="./styles.css"></link>
   <style>
@@ -17,9 +18,20 @@
 <body>
   <h1>VSMap Prototype</h1>
   <div id="map"></div>
-  <script src='./libs/v6.3.1-dist/ol.js' type="text/javascript"></script>
-    <script src='./libs/jquery-3.5.1/jQuery.js' type="text/javascript"></script>
-  <script src="./main.js" type="text/javascript"></script>
+  <form class="form-inline">
+    <label>Action type &nbsp;</label>
+      <select id="type" class="form-control">
+        <option value="click" selected>Click</option>
+        <option value="singleclick">Single-click</option>
+        <option value="pointermove">Hover</option>
+        <option value="altclick">Alt+Click</option>
+        <option value="none">None</option>
+      </select>
+    <span id="status">&nbsp;0 selected features</span>
+  </form>
+  <script src='./libs/v6.3.1-dist/ol.js' type="module"></script>
+    <script src='./libs/jquery-3.5.1/jQuery.js' type="module"></script>
+  <script src="./main.js" type="module"></script>
   <a id="console"></a>
 </body>
 </html>
