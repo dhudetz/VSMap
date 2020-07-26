@@ -5,6 +5,8 @@ window.onresize = function()
 }
 
 var map;
+const fs = require('fs');
+
 function init(){
   map = new ol.Map({
     view: new ol.View({
@@ -25,7 +27,7 @@ function init(){
   //Vector layers
   const districtsGeoJSON = new ol.layer.VectorImage({
     source: new ol.source.Vector({
-      url: './data/districts.json',
+      url: 'https://theunitedstates.io/districts/cds/2012/NY-2/shape.geojson',
       format: new ol.format.GeoJSON()
     }),
     visible: true,
@@ -57,7 +59,7 @@ function init(){
     if (currZoom != newZoom) {
       if(newZoom >= 6){
         map.removeLayer(statesGeoJSON);
-        map.addLayer(districtsGeoJSON);
+        loadStateDistricts('NY');
       }
       else{
         map.removeLayer(districtsGeoJSON);
@@ -82,4 +84,32 @@ function toggleFullScreen(mapContainer) {
       $(mapContainer).addClass("normal").removeClass("fullscreen");
   }
   map.updateSize();
+}
+
+/*Function for loading and displaying all districts
+of a state*/
+function loadStateDistricts(state){
+  var numDistricts;
+  //jsonReader to get numberOfDistricts
+  /*jsonReader('data/numberOfDistricts.json', (err, country) => {
+    if (err) {
+        console.log(err)
+        return
+    }
+    numDistricts=country[state];
+  })*/
+  numDistricts=30;
+  console.log(numDistricts);
+  //Loop through the districts for this state
+  for(var i = 1; i<=numDistricts; i++){
+    const districtsGeoJSON = new ol.layer.VectorImage({
+      source: new ol.source.Vector({
+        url: 'https://theunitedstates.io/districts/cds/2012/'+state+'-'+i.toString()+'/shape.geojson',
+        format: new ol.format.GeoJSON()
+      }),
+      visible: true,
+      title: 'DistrictsGeoJSON'
+    })
+    map.addLayer(districtsGeoJSON);
+  }
 }
