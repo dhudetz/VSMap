@@ -10,25 +10,59 @@
   <link rel="stylesheet" href="./styles.css"></link>
   <style>
     #map{
-      height:400px;
+      height:800px;
       width:100%;
     }
+      .ol-popup {
+        position: absolute;
+        background-color: white;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+        padding: 15px;
+        border-radius: 10px;
+        border: 1px solid #cccccc;
+        bottom: 12px;
+        left: -50px;
+        min-width: 280px;
+      }
+      .ol-popup:after, .ol-popup:before {
+        top: 100%;
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+      }
+      .ol-popup:after {
+        border-top-color: white;
+        border-width: 10px;
+        left: 48px;
+        margin-left: -10px;
+      }
+      .ol-popup:before {
+        border-top-color: #cccccc;
+        border-width: 11px;
+        left: 48px;
+        margin-left: -11px;
+      }
+      .ol-popup-closer {
+        text-decoration: none;
+        position: absolute;
+        top: 2px;
+        right: 8px;
+      }
+      .ol-popup-closer:after {
+        content: "✖";
+      }
   </style>
 </head>
 <body>
   <h1>VSMap Prototype</h1>
   <div id="map"></div>
-  <form class="form-inline">
-    <label>Action type &nbsp;</label>
-      <select id="type" class="form-control">
-        <option value="click" selected>Click</option>
-        <option value="singleclick">Single-click</option>
-        <option value="pointermove">Hover</option>
-        <option value="altclick">Alt+Click</option>
-        <option value="none">None</option>
-      </select>
-    <span id="status">&nbsp;0 selected features</span>
-  </form>
+  <div id="popup" class="ol-popup">
+    <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+    <div id="popup-content"></div>
+  </div>
   <script src='./libs/v6.3.1-dist/ol.js' type="module"></script>
     <script src='./libs/jquery-3.5.1/jQuery.js' type="module"></script>
   <script src="./main.js" type="module"></script>
