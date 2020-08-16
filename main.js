@@ -7,7 +7,7 @@ window.onresize = function()
 }
 
 // Variables for zooming in on a selected state
-var stateClicked = false;
+var regionClicked = false;
 var coordinateRecieved = null;
 var stateMode = true;
 var numDistrictsJson;
@@ -77,8 +77,10 @@ function init(){
   var select = new ol.interaction.Select();
   map.addInteraction(select);
   select.on('select', function (e) {
-    stateClicked =true;
-    attemptSelectState();
+    regionClicked =true;
+    var features = select.getFeatures();
+    console.log(features);
+    selectRegion();
   });
 
   map.on('click', function(e){
@@ -91,7 +93,7 @@ function init(){
       extent: [-20000000,1420000,-5130000,12750000]
     });
     coordinateRecieved = e.coordinate;
-    attemptSelectState();
+    selectRegion();
   })
   //Loading/unloading states and districts depending on zoom level
   var currZoom = map.getView().getZoom();
@@ -133,11 +135,11 @@ function loadStateDistricts(state){
   for(var i = 1; i<=numDistricts; i++){
     var strokeColor,fillColor;
     if (i%3!=0){
-      strokeColor = '#f00';
-      fillColor = 'rgba(255,0,0,0.2)';
+      strokeColor = '#000';
+      fillColor = 'rgba(255,0,255,0.2)';
     }
     else {
-      strokeColor = '#0f0';
+      strokeColor = '#000';
       fillColor = 'rgba(0,255,0,0.2)';
     }
     const districtsGeoJSON = new ol.layer.VectorImage({
@@ -162,21 +164,26 @@ function loadStateDistricts(state){
   }
 }
 
-function attemptSelectState(){
-  if(stateClicked && coordinateRecieved!=null){
+function selectRegion(){
+  if(regionClicked && coordinateRecieved!=null){
     if(stateMode==true){
+      stateMode=false;
       map.removeLayer(statesGeoJSON);
       loadStateDistricts('IL');
       view.setCenter(coordinateRecieved);
       view.setZoom(6);
       coordinateRecieved=null;
-      stateClicked=false;
-      stateMode=false;
+      regionClicked=false;
     }
     else{
+      regionClicked=false;
       content.innerHTML = '<p>This district has many reports of 2 hour+ lines</p>';
+      console.log("hi");
       overlay.setPosition(coordinateRecieved);
     }
+  }
+  else{
+
   }
 }
 
