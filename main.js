@@ -10,10 +10,14 @@ window.onresize = function()
 var regionClicked = false;
 var coordinateRecieved = null;
 var stateMode = true;
-var numDistrictsJson;
+var numDistrictsJson,stateAbbreviationsJson;
 //get json of number of districts for each state
 $.getJSON("./data/numberOfDistricts.json", function(json) {
   numDistrictsJson=json;
+});
+
+$.getJSON("./data/stateAbbreviations.json", function(json) {
+  stateAbbreviationsJson=json;
 });
 
 const statesGeoJSON = new ol.layer.VectorImage({
@@ -25,7 +29,7 @@ const statesGeoJSON = new ol.layer.VectorImage({
   title: 'StatesGeoJSON'
 })
 
-const zoomCutOff=5;
+const zoomCutOff=5.9;
 var map;
 //const fs = require('fs');
 
@@ -77,23 +81,24 @@ function init(){
   var select = new ol.interaction.Select();
   map.addInteraction(select);
   select.on('select', function (e) {
-    regionClicked =true;
-    var features = select.getFeatures();
-    console.log(features);
-    selectRegion();
+
   });
 
   map.on('click', function(e){
-    var size = map.getSize();
-    var districtView = new ol.View({
+    map.forEachFeatureAtPixel(e.pixel, function(f){
+      console.log(f.get("NAME"));
+      coordinateRecieved = e.coordinate;
+      regionClicked=true;
+      //opening the state based off selected name
+      selectRegion(f.get("NAME"));
+    })
+    /*var districtView = new ol.View({
       center:e.coordinate,
       zoom: 7,
       maxZoom: 10,
       minZoom: 5,
       extent: [-20000000,1420000,-5130000,12750000]
-    });
-    coordinateRecieved = e.coordinate;
-    selectRegion();
+    });*/
   })
   //Loading/unloading states and districts depending on zoom level
   var currZoom = map.getView().getZoom();
@@ -109,18 +114,6 @@ function init(){
       currZoom = newZoom;
     }
   });
-  //toggleFullScreen("#map");
-  //toggleFullScreen("#map");
-}
-
-// Toggling class of map div
-function toggleFullScreen(mapContainer) {
-  if ($(mapContainer).hasClass("normal")) {
-      $(mapContainer).addClass("fullscreen").removeClass("normal");
-  } else {
-      $(mapContainer).addClass("normal").removeClass("fullscreen");
-  }
-  map.updateSize();
 }
 
 //Holds all of the currently loaded districts
@@ -132,15 +125,28 @@ function loadStateDistricts(state){
   var numDistricts=numDistrictsJson[state];
   //Loop through the districts for this state
   loadedDistricts = new Array(numDistricts);
-  for(var i = 1; i<=numDistricts; i++){
+  var startCount,endCount;
+  if (numDistricts==1){
+    startCount=0;
+    endCount=numDistricts-1;
+  }
+  else{
+    startCount=1;
+    endCount=numDistricts;
+  }
+  for(var i = startCount; i<=endCount; i++){
     var strokeColor,fillColor;
-    if (i%3!=0){
+    if (i%3==0){
       strokeColor = '#000';
       fillColor = 'rgba(255,0,255,0.2)';
     }
-    else {
+    else if (i%2==0){
       strokeColor = '#000';
-      fillColor = 'rgba(0,255,0,0.2)';
+      fillColor = 'rgba(255,255,0,0.2)';
+    }
+    else{
+      strokeColor = '#000';
+      fillColor = 'rgba(0,255,255,0.2)';
     }
     const districtsGeoJSON = new ol.layer.VectorImage({
       source: new ol.source.Vector({
@@ -156,20 +162,20 @@ function loadStateDistricts(state){
         }),
         fill: new ol.style.Fill({
           color: fillColor,
-        }),
+        })
       })
     })
-    loadedDistricts[i-1]=districtsGeoJSON;
+    loadedDistricts[i-startCount]=districtsGeoJSON;
     map.addLayer(districtsGeoJSON);
   }
 }
 
-function selectRegion(){
+function selectRegion(stateName){
   if(regionClicked && coordinateRecieved!=null){
     if(stateMode==true){
       stateMode=false;
       map.removeLayer(statesGeoJSON);
-      loadStateDistricts('IL');
+      loadStateDistricts(stateAbbreviationsJson[stateName]);
       view.setCenter(coordinateRecieved);
       view.setZoom(6);
       coordinateRecieved=null;
@@ -178,12 +184,8 @@ function selectRegion(){
     else{
       regionClicked=false;
       content.innerHTML = '<p>This district has many reports of 2 hour+ lines</p>';
-      console.log("hi");
       overlay.setPosition(coordinateRecieved);
     }
-  }
-  else{
-
   }
 }
 
