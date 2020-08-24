@@ -170,6 +170,7 @@ function loadStateDistricts(state){
   }
 }
 
+var fakeCount=0;
 function selectRegion(stateName){
   if(regionClicked && coordinateRecieved!=null){
     if(stateMode==true){
@@ -183,7 +184,16 @@ function selectRegion(stateName){
     }
     else{
       regionClicked=false;
-      content.innerHTML = '<p>This district has many reports of 2 hour+ lines</p>';
+      if(fakeCount%3==0){
+        content.innerHTML = '<p>No early voting</p>';
+      }
+      else if(fakeCount%2==0){
+        content.innerHTML = '<p>Federal military spotted on 18th street polling.</p>';
+      }
+      else{
+        content.innerHTML = '<p>This district has many reports of ' + fakeCount + 'hour+ lines</p>';
+      }
+      fakeCount++;
       overlay.setPosition(coordinateRecieved);
     }
   }
